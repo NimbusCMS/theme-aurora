@@ -1,0 +1,19 @@
+{
+    "name": "Aurora",
+    "version": "0.1.0",
+    "description": "A magical-sky theme for NimbusCMS — deep-indigo night grounds, an aurora accent, and moonlit-parchment content. Ships a fully-styled Storefront (shop) and generic content templates. Plain PHP, one stylesheet, no build step, no external assets. An official theme.",
+    "nav": true,
+    "templates": {
+        "layout": "HTML shell; includes header and footer.",
+        "header": "Wordmark + main menu on the night ground.",
+        "footer": "Footer menu + colophon under an aurora hairline.",
+        "entry-home": "The landing page (the `home` singleton) — a night hero, then the body.",
+        "entry": "A single entry — a centered reading column on parchment.",
+        "collection": "A collection's entries as a card grid.",
+        "shop-index": "Overrides the Storefront plugin's listing (ADR 0023) — a night hero, filter bar, and product grid.",
+        "shop-product": "Overrides the Storefront plugin's product page — a two-column parchment layout.",
+        "404": "Themed not-found page."
+    },
+    "specialization": "Add collection-{handle} or entry-{handle} to override the generic template for one collection. `nav` is true (every browsable collection is offered to the header/nav). Aurora also overrides the Storefront plugin's `shop-index`/`shop-product` section templates (ADR 0023 — theme templates win).",
+    "assets": "Files under assets/ are served at /theme/assets/<path>. app.css is the whole design system — system fonts and CSS-only motifs, no external or binary assets, so it loads under the strict same-origin CSP."
+}

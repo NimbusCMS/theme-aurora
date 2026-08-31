@@ -1,0 +1,47 @@
+{
+    "name": "nimbuscms/theme-aurora",
+    "description": "Aurora — a magical-sky theme for NimbusCMS. An official theme.",
+    "type": "nimbuscms-theme",
+    "keywords": ["nimbuscms", "nimbuscms-theme", "theme", "storefront", "cms"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "DanMat"
+        }
+    ],
+    "require": {
+        "php": ">=8.2"
+    },
+    "require-dev": {
+        "nimbuscms/nimbus": "dev-main",
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "phpstan/phpstan": "^2.2",
+        "phpunit/phpunit": "^11.0"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/NimbusCMS/nimbus"
+        }
+    ],
+    "autoload-dev": {
+        "psr-4": {
+            "NimbusCMS\\ThemeAurora\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse --memory-limit=512M",
+        "check": ["@analyse", "@test"],
+        "format": "php-cs-fixer fix",
+        "format:check": "php-cs-fixer fix --dry-run --diff"
+    },
+    "config": {
+        "sort-packages": true,
+        "platform": {
+            "php": "8.2.0"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
