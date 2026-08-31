@@ -78,6 +78,26 @@ final class ThemeRenderTest extends TestCase
         self::assertStringContainsString('&lt;', $html);
     }
 
+    public function test_cart_escapes_item_names_and_carries_the_csrf_token(): void
+    {
+        $cart = ['lines' => [[
+            'sku_code' => 'x', 'name' => '<script>alert(1)</script>', 'unit' => null,
+            'qty' => 2, 'unit_price' => '1.00', 'line_total' => '2.00', 'availability' => 'in_stock',
+        ]], 'total' => '2.00', 'count' => 1];
+        $html = $this->view->renderBare('shop-cart', ['cart' => $cart, 'csrf' => 'CSRF123', 'available' => true]);
+
+        self::assertStringNotContainsString('<script>alert(1)</script>', $html);
+        self::assertStringContainsString('&lt;script&gt;', $html);
+        self::assertStringContainsString('value="CSRF123"', $html, 'the CSRF token is in the update/remove forms');
+    }
+
+    public function test_order_confirmation_escapes_the_reference(): void
+    {
+        $html = $this->view->renderBare('shop-order', ['ref' => '<b>ORD</b>']);
+        self::assertStringNotContainsString('<b>ORD</b>', $html);
+        self::assertStringContainsString('&lt;b&gt;', $html);
+    }
+
     /**
      * @dataProvider templateFiles
      */
