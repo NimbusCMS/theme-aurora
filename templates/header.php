@@ -11,12 +11,11 @@ $main = ($menus ?? [])['main'] ?? [];
 <header class="site-header night">
     <div class="container">
         <a class="wordmark" href="/"><span class="spark">✧</span> <?= $e($appName) ?></a>
-        <?php if ($main !== []): ?>
-            <nav class="site-nav" aria-label="Main">
-                <?php foreach ($main as $item): ?>
-                    <a href="<?= $e($item['url']) ?>"><?= $e($item['label']) ?></a>
-                <?php endforeach; ?>
-            </nav>
-        <?php endif; ?>
+        <nav class="site-nav" aria-label="Main">
+            <?php foreach ($main as $item): ?>
+                <a href="<?= $e($item['url']) ?>"><?= $e($item['label']) ?></a>
+            <?php endforeach; ?>
+            <a class="nav-cart" href="/cart" aria-label="Cart">Cart</a>
+        </nav>
     </div>
 </header>

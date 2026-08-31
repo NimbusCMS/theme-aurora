@@ -11,6 +11,7 @@
  * @var int $page
  * @var int $pages
  * @var bool $available
+ * @var string $cart_csrf
  */
 $labels = ['in_stock' => 'In stock', 'low' => 'Low stock', 'out' => 'Out of stock'];
 $sorts  = ['featured' => 'Featured', 'name' => 'Name', 'price_asc' => 'Price: low to high', 'price_desc' => 'Price: high to low'];
@@ -74,6 +75,14 @@ $pageUrl = static function (int $n) use ($current): string {
                         <a class="product-name" href="<?= $e($href) ?>"><?= $e($it['name']) ?></a>
                         <span class="price"><?= $e($it['price']) ?><?php if ($it['unit'] !== null): ?> <span class="unit">/ <?= $e($it['unit']) ?></span><?php endif; ?></span>
                         <span class="pill <?= $e($it['availability']) ?>"><?= $e($labels[$it['availability']] ?? $it['availability']) ?></span>
+                        <?php if ($it['availability'] !== 'out'): ?>
+                            <form class="add" method="post" action="/ext/shop/cart/add">
+                                <input type="hidden" name="_cart_csrf" value="<?= $e($cart_csrf ?? '') ?>">
+                                <input type="hidden" name="sku" value="<?= $e($it['sku_code']) ?>">
+                                <input type="hidden" name="qty" value="1">
+                                <button type="submit" class="btn btn-quiet">Add to cart</button>
+                            </form>
+                        <?php endif; ?>
                     </div>
                 </article>
             <?php endforeach; ?>
