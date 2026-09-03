@@ -276,6 +276,9 @@ main { display: block; }
     border-radius: 999px; background: var(--gold); color: var(--night);
     font-size: .78rem; font-weight: 800; font-variant-numeric: tabular-nums;
 }
+/* The badge starts hidden on cached content pages until the fetch fills it — the
+   .count display rule above would otherwise beat the [hidden] user-agent default. */
+.nav-cart .count[hidden] { display: none; }
 
 .btn-sm { min-height: 38px; padding: .4rem .85rem; font-size: .9rem; }
 
