@@ -99,6 +99,102 @@ final class ThemeRenderTest extends TestCase
     }
 
     /**
+     * The prose parser's one security rule: escape FIRST, format second. A script tag
+     * in author copy is inert; `**bold**`/`## `/lists produce only the tags the
+     * parser constructs; and `[text](url)` becomes a link ONLY for a safe relative
+     * URL — `javascript:`/protocol-relative/absolute-external render as plain text.
+     */
+    public function test_prose_parser_escapes_first_and_gates_links(): void
+    {
+        $prose = require dirname(__DIR__) . '/templates/_prose.php';
+        $e     = static fn (?string $v): string => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+
+        $inert = $prose('<script>alert(1)</script>', $e);
+        self::assertStringNotContainsString('<script>alert(1)', $inert);
+        self::assertStringContainsString('&lt;script&gt;', $inert);
+
+        $rich = $prose("## Title\n\n- one\n- two\n\n**bold** words", $e);
+        self::assertStringContainsString('<h2>Title</h2>', $rich);
+        self::assertStringContainsString('<ul><li>one</li><li>two</li></ul>', $rich);
+        self::assertStringContainsString('<strong>bold</strong>', $rich);
+
+        $links = $prose('[ok](/shop) [a](javascript:alert(1)) [b](//evil.example) [c](https://evil.example)', $e);
+        self::assertStringContainsString('<a href="/shop">ok</a>', $links);
+        self::assertStringNotContainsString('href="javascript', $links);
+        self::assertStringNotContainsString('<a href="//', $links);
+        self::assertStringNotContainsString('<a href="https://', $links);
+    }
+
+    /** The shared safe-href allow-list: site-relative allowed; every scheme + //host rejected. */
+    public function test_safe_href_allow_list(): void
+    {
+        $safe = require dirname(__DIR__) . '/templates/_url.php';
+
+        self::assertSame('/shop', $safe('/shop'));
+        self::assertSame('/shop?category=fruit', $safe('/shop?category=fruit'));
+        self::assertSame('#top', $safe('#top'));
+        self::assertSame('about', $safe('about'));
+
+        self::assertNull($safe('javascript:alert(1)'));
+        self::assertNull($safe('data:text/html,x'));
+        self::assertNull($safe('//evil.example'));
+        self::assertNull($safe('https://evil.example'));
+        self::assertNull($safe('mailto:x@y.z'));
+        self::assertNull($safe('foo:bar'));
+        self::assertNull($safe(''));
+    }
+
+    /** The home landing escapes authored values and gates aisle links (relative-only). */
+    public function test_entry_home_escapes_and_gates_aisle_links(): void
+    {
+        $html = $this->view->renderBare('entry-home', [
+            'appName' => 'Foodmart',
+            'entry'   => ['title' => 'Home', 'fields' => [
+                'tagline' => '<script>alert(1)</script>',
+                'aisles'  => "Fruit | fresh | /shop?category=fruit\nEvil | x | javascript:alert(1)\nAbs | y | https://evil.example",
+                'body'    => "## About us\n\nWe **care** about food.",
+            ]],
+        ]);
+
+        self::assertStringNotContainsString('<script>alert(1)</script>', $html);
+        self::assertStringContainsString('&lt;script&gt;', $html);
+        self::assertStringContainsString('href="/shop?category=fruit"', $html, 'a safe aisle URL becomes a link');
+        self::assertStringNotContainsString('href="javascript', $html);
+        self::assertStringNotContainsString('href="https://evil', $html);
+        self::assertStringContainsString('<h2>About us</h2>', $html);
+        self::assertStringContainsString('<strong>care</strong>', $html);
+    }
+
+    /**
+     * The header cart count renders ONLY when a cart_summary is supplied (section
+     * pages). On content pages (null summary) it must not render — a count baked into
+     * a path-cached page would leak across visitors (ADR 0026 cache-safety).
+     */
+    public function test_header_cart_count_is_section_only(): void
+    {
+        $section = $this->view->renderBare('header', ['appName' => 'X', 'menus' => [], 'cart_summary' => ['count' => 3, 'total' => '9.99']]);
+        self::assertStringContainsString('class="count"', $section);
+        self::assertStringContainsString('>3</span>', $section);
+
+        $content = $this->view->renderBare('header', ['appName' => 'X', 'menus' => [], 'cart_summary' => null]);
+        self::assertStringNotContainsString('class="count"', $content, 'no count on a content (cached) page');
+    }
+
+    /** The listing flash escapes the item name and flags the just-added card. */
+    public function test_shop_index_flash_escapes_and_marks_the_added_card(): void
+    {
+        $data           = $this->shopData('milk');
+        $data['added']  = ['sku' => 'x', 'name' => '<b>Milk</b>'];
+        $data['notice'] = null;
+        $html           = $this->view->renderBare('shop-index', $data);
+
+        self::assertStringContainsString('flash-ok', $html);
+        self::assertStringNotContainsString('<b>Milk</b>', $html, 'the added name is escaped');
+        self::assertStringContainsString('&lt;b&gt;Milk', $html);
+        self::assertStringContainsString('is-added', $html, 'the matching card (sku=x) is flagged');
+    }
+
+    /**
      * @dataProvider templateFiles
      */
     public function test_templates_have_no_inline_style_and_no_script_or_style_blocks(string $file): void

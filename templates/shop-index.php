@@ -12,9 +12,19 @@
  * @var int $pages
  * @var bool $available
  * @var string $cart_csrf
+ * @var array{sku:string,name:string}|null $added the just-added item (flash + card state)
+ * @var ?string $notice a validated notice code
  */
 $labels = ['in_stock' => 'In stock', 'low' => 'Low stock', 'out' => 'Out of stock'];
 $sorts  = ['featured' => 'Featured', 'name' => 'Name', 'price_asc' => 'Price: low to high', 'price_desc' => 'Price: high to low'];
+$notices = [
+    'unavailable' => 'That item is unavailable right now.',
+    'expired'     => 'Your session expired — please try again.',
+    'empty'       => 'Your cart is empty.',
+    'stock'       => 'Sorry, that item just went out of stock.',
+];
+$added  = $added ?? null;
+$notice = $notice ?? null;
 $pageUrl = static function (int $n) use ($current): string {
     $q = array_filter(['category' => $current['category'], 'q' => $current['q'], 'sort' => $current['sort'], 'page' => $n > 1 ? (string) $n : '']);
     return '/shop' . ($q === [] ? '' : '?' . http_build_query($q));
@@ -28,6 +38,12 @@ $pageUrl = static function (int $n) use ($current): string {
 </section>
 
 <div class="container section">
+    <?php if ($added !== null): ?>
+        <p class="flash flash-ok" role="status">Added <strong><?= $e($added['name']) ?></strong> to your cart. <a href="/cart">View cart →</a></p>
+    <?php elseif ($notice !== null && isset($notices[$notice])): ?>
+        <p class="flash flash-warn" role="status"><?= $e($notices[$notice]) ?></p>
+    <?php endif; ?>
+
     <form class="filters" method="get" action="/shop" role="search">
         <div class="field">
             <label for="q">Search</label>
@@ -63,7 +79,8 @@ $pageUrl = static function (int $n) use ($current): string {
         <div class="product-grid">
             <?php foreach ($items as $it): ?>
                 <?php $img = $media($it['image_media_id']); $href = '/shop/' . rawurlencode($it['sku_code']); ?>
-                <article class="product">
+                <?php $isAdded = $added !== null && $added['sku'] === $it['sku_code']; ?>
+                <article class="product<?= $isAdded ? ' is-added' : '' ?>">
                     <a href="<?= $e($href) ?>" aria-label="<?= $e($it['name']) ?>">
                         <?php if ($img !== null): ?>
                             <img class="thumb" src="<?= $e($img['url']) ?>" alt="<?= $e($img['alt'] ?? $it['name']) ?>" loading="lazy">
@@ -80,7 +97,12 @@ $pageUrl = static function (int $n) use ($current): string {
                                 <input type="hidden" name="_cart_csrf" value="<?= $e($cart_csrf ?? '') ?>">
                                 <input type="hidden" name="sku" value="<?= $e($it['sku_code']) ?>">
                                 <input type="hidden" name="qty" value="1">
-                                <button type="submit" class="btn btn-quiet">Add to cart</button>
+                                <input type="hidden" name="return" value="shop">
+                                <input type="hidden" name="category" value="<?= $e($current['category']) ?>">
+                                <input type="hidden" name="q" value="<?= $e($current['q']) ?>">
+                                <input type="hidden" name="sort" value="<?= $e($current['sort']) ?>">
+                                <input type="hidden" name="page" value="<?= $e((string) $page) ?>">
+                                <button type="submit" class="btn btn-quiet btn-sm"><?= $isAdded ? 'Added ✓ — add another' : 'Add to cart' ?></button>
                             </form>
                         <?php endif; ?>
                     </div>
