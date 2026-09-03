@@ -171,9 +171,10 @@ final class ThemeRenderTest extends TestCase
         $html = $this->view->renderBare('entry-home', [
             'appName' => 'Shop',
             'entry'   => ['title' => 'Home', 'fields' => ['tagline' => 'Hi']],
+            'media'   => static fn (?int $id): ?array => $id === 7 ? ['url' => '/uploads/items/milk.jpg', 'alt' => 'Milk'] : null,
             'contrib' => ['nimbuscms.storefront' => ['featured' => [[
                 'sku_code' => 'a b', 'name' => '<b>Milk</b>', 'price' => '1.20', 'unit' => 'litre',
-                'availability' => 'in_stock', 'image_media_id' => null,
+                'availability' => 'in_stock', 'image_media_id' => 7,
             ]]]],
         ]);
 
@@ -181,6 +182,7 @@ final class ThemeRenderTest extends TestCase
         self::assertStringNotContainsString('<b>Milk</b>', $html, 'the featured name is escaped');
         self::assertStringContainsString('&lt;b&gt;Milk', $html);
         self::assertStringContainsString('href="/shop/a%20b"', $html, 'sku is rawurlencoded into the link');
+        self::assertStringContainsString('src="/uploads/items/milk.jpg"', $html, 'the resolved product photo renders');
     }
 
     /** No contribution → no featured row (the seam is inert without a plugin). */

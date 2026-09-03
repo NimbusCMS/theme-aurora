@@ -13,8 +13,10 @@
  * @var string $appName
  * @var callable(?string):string $e
  * @var array<string,array<string,mixed>> $contrib live plugin view-data (ADR 0027)
+ * @var callable(?int):?array{url:string,alt:?string} $media media-id resolver
  */
 $e = $e ?? static fn (?string $v): string => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+$media = $media ?? static fn (?int $id): ?array => null;
 $prose    = require __DIR__ . '/_prose.php';
 $safeHref = require __DIR__ . '/_url.php';
 
@@ -83,8 +85,13 @@ $closing = $str('closing');
             <div class="featured-grid">
                 <?php foreach ($featured as $it): ?>
                     <?php $avail = (string) ($it['availability'] ?? 'in_stock'); ?>
+                    <?php $img = $media($it['image_media_id'] ?? null); ?>
                     <a class="featured-card" href="/shop/<?= $e(rawurlencode((string) $it['sku_code'])) ?>">
-                        <span class="thumb thumb-empty" aria-hidden="true">✦</span>
+                        <?php if ($img !== null): ?>
+                            <img class="thumb" src="<?= $e($img['url']) ?>" alt="<?= $e($img['alt'] ?? (string) $it['name']) ?>" loading="lazy">
+                        <?php else: ?>
+                            <span class="thumb thumb-empty" aria-hidden="true">✦</span>
+                        <?php endif; ?>
                         <span class="featured-name"><?= $e((string) $it['name']) ?></span>
                         <span class="price"><?= $e((string) $it['price']) ?><?php if (($it['unit'] ?? null) !== null): ?> <span class="unit">/ <?= $e((string) $it['unit']) ?></span><?php endif; ?></span>
                         <span class="pill <?= $e($avail) ?>"><?= $e($availLabels[$avail] ?? $avail) ?></span>

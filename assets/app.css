@@ -312,7 +312,8 @@ a.aisle:hover { transform: translateY(-3px); box-shadow: 0 10px 34px rgba(11,16,
     transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
 }
 .featured-card:hover { transform: translateY(-3px); box-shadow: 0 10px 34px rgba(11,16,32,.14); border-color: var(--gold); }
-.featured-card .thumb { aspect-ratio: 1 / 1; width: 100%; display: grid; place-items: center; background: linear-gradient(135deg, #eceaf1, #f4f1e8); color: #c4c0d4; font-family: var(--serif); font-size: 2rem; margin-bottom: .5rem; }
+.featured-card .thumb { aspect-ratio: 1 / 1; width: 100%; object-fit: cover; background: linear-gradient(135deg, #eceaf1, #f4f1e8); margin-bottom: .5rem; }
+.featured-card .thumb-empty { display: grid; place-items: center; color: #c4c0d4; font-family: var(--serif); font-size: 2rem; }
 .featured-card .featured-name { font-family: var(--serif); font-size: 1.05rem; font-weight: 600; padding-inline: .9rem; }
 .featured-card .price, .featured-card .pill { margin-inline: .9rem; }
 .featured-card .pill { align-self: flex-start; }
