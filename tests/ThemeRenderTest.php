@@ -216,14 +216,21 @@ final class ThemeRenderTest extends TestCase
      * pages). On content pages (null summary) it must not render — a count baked into
      * a path-cached page would leak across visitors (ADR 0026 cache-safety).
      */
-    public function test_header_cart_count_is_section_only(): void
+    public function test_header_cart_count_is_server_rendered_on_sections_and_fetched_on_content(): void
     {
-        $section = $this->view->renderBare('header', ['appName' => 'X', 'menus' => [], 'cart_summary' => ['count' => 3, 'total' => '9.99']]);
-        self::assertStringContainsString('class="count"', $section);
-        self::assertStringContainsString('>3</span>', $section);
+        // Section page: the server renders the count, and no client fetch is emitted.
+        $section = $this->view->renderBare('header', ['appName' => 'X', 'menus' => [], 'cart_summary' => ['count' => 3, 'total' => '9.99'], 'cspNonce' => 'testnonce']);
+        self::assertStringContainsString('>3</span>', $section, 'server-rendered count on a section page');
+        self::assertStringNotContainsString('cart/summary', $section, 'no client fetch when the server already rendered the count');
 
-        $content = $this->view->renderBare('header', ['appName' => 'X', 'menus' => [], 'cart_summary' => null]);
-        self::assertStringNotContainsString('class="count"', $content, 'no count on a content (cached) page');
+        // Content (page-cached) page: no count baked in — the badge starts hidden and
+        // a nonce'd fetch fills it per-visitor (never from the shared cache).
+        $content = $this->view->renderBare('header', ['appName' => 'X', 'menus' => [], 'cart_summary' => null, 'cspNonce' => 'testnonce']);
+        self::assertStringContainsString('class="count" hidden', $content, 'the badge starts hidden on a content page');
+        self::assertStringContainsString('/ext/shop/cart/summary', $content, 'the client fetch fills it per-visitor');
+        self::assertStringContainsString('nonce="testnonce"', $content, "the script is nonce'd for the CSP");
+        self::assertStringContainsString('textContent', $content, 'the DOM write is textContent (not innerHTML)');
+        self::assertStringNotContainsString('innerHTML', $content);
     }
 
     /** The listing flash escapes the item name and flags the just-added card. */
@@ -247,9 +254,11 @@ final class ThemeRenderTest extends TestCase
     {
         $src = (string) file_get_contents($file);
         self::assertDoesNotMatchRegularExpression('/\sstyle\s*=\s*["\']/', $src, "no inline style= in {$file} (dropped by the nonce-only CSP)");
-        // Aurora keeps ALL styling in app.css — no <style>/<script> in templates.
+        // Aurora keeps ALL styling in app.css — no <style> blocks in templates.
         self::assertStringNotContainsString('<style', $src, "no <style> block in {$file}");
-        self::assertStringNotContainsString('<script', $src, "no <script> in {$file}");
+        // A <script> is allowed ONLY if it carries a nonce (the nonce-only CSP drops
+        // an un-nonced inline script) — e.g. the header's cart-count fetch.
+        self::assertDoesNotMatchRegularExpression('/<script(?![^>]*\bnonce=)/', $src, "any <script> in {$file} must carry a nonce");
     }
 
     /** @return list<array{string}> */
