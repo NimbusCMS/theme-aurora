@@ -1,6 +1,6 @@
 {
     "name": "Aurora",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "description": "A magical-sky theme for NimbusCMS — deep-indigo night grounds, an aurora accent, and moonlit-parchment content. Ships a fully-styled Storefront (shop) and generic content templates. Plain PHP, one stylesheet, no build step, no external assets. An official theme.",
     "nav": true,
     "templates": {
