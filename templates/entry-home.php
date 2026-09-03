@@ -12,10 +12,15 @@
  * @var array{title:string,fields:array<string,mixed>} $entry
  * @var string $appName
  * @var callable(?string):string $e
+ * @var array<string,array<string,mixed>> $contrib live plugin view-data (ADR 0027)
  */
 $e = $e ?? static fn (?string $v): string => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 $prose    = require __DIR__ . '/_prose.php';
 $safeHref = require __DIR__ . '/_url.php';
+
+// Live featured products, if a storefront plugin contributed them (ADR 0027).
+$featured = $contrib['nimbuscms.storefront']['featured'] ?? [];
+$availLabels = ['in_stock' => 'In stock', 'low' => 'Low stock', 'out' => 'Out of stock'];
 
 $f    = $entry['fields'] ?? [];
 $str  = static fn (string $k): string => is_scalar($f[$k] ?? null) ? trim((string) $f[$k]) : '';
@@ -67,6 +72,25 @@ $closing = $str('closing');
                     <?php if (($p[1] ?? '') !== ''): ?><p class="promise-detail"><?= $e($p[1]) ?></p><?php endif; ?>
                 </div>
             <?php endforeach; ?>
+        </div>
+    </section>
+<?php endif; ?>
+
+<?php if ($featured !== []): ?>
+    <section class="section featured">
+        <div class="container">
+            <h2>Featured this week</h2>
+            <div class="featured-grid">
+                <?php foreach ($featured as $it): ?>
+                    <?php $avail = (string) ($it['availability'] ?? 'in_stock'); ?>
+                    <a class="featured-card" href="/shop/<?= $e(rawurlencode((string) $it['sku_code'])) ?>">
+                        <span class="thumb thumb-empty" aria-hidden="true">✦</span>
+                        <span class="featured-name"><?= $e((string) $it['name']) ?></span>
+                        <span class="price"><?= $e((string) $it['price']) ?><?php if (($it['unit'] ?? null) !== null): ?> <span class="unit">/ <?= $e((string) $it['unit']) ?></span><?php endif; ?></span>
+                        <span class="pill <?= $e($avail) ?>"><?= $e($availLabels[$avail] ?? $avail) ?></span>
+                    </a>
+                <?php endforeach; ?>
+            </div>
         </div>
     </section>
 <?php endif; ?>

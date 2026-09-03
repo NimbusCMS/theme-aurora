@@ -165,6 +165,34 @@ final class ThemeRenderTest extends TestCase
         self::assertStringContainsString('<strong>care</strong>', $html);
     }
 
+    /** The home renders a live "Featured this week" row from contributed view data (ADR 0027), escaped. */
+    public function test_entry_home_renders_contributed_featured_products_escaped(): void
+    {
+        $html = $this->view->renderBare('entry-home', [
+            'appName' => 'Shop',
+            'entry'   => ['title' => 'Home', 'fields' => ['tagline' => 'Hi']],
+            'contrib' => ['nimbuscms.storefront' => ['featured' => [[
+                'sku_code' => 'a b', 'name' => '<b>Milk</b>', 'price' => '1.20', 'unit' => 'litre',
+                'availability' => 'in_stock', 'image_media_id' => null,
+            ]]]],
+        ]);
+
+        self::assertStringContainsString('Featured this week', $html);
+        self::assertStringNotContainsString('<b>Milk</b>', $html, 'the featured name is escaped');
+        self::assertStringContainsString('&lt;b&gt;Milk', $html);
+        self::assertStringContainsString('href="/shop/a%20b"', $html, 'sku is rawurlencoded into the link');
+    }
+
+    /** No contribution → no featured row (the seam is inert without a plugin). */
+    public function test_entry_home_has_no_featured_row_without_a_contribution(): void
+    {
+        $html = $this->view->renderBare('entry-home', [
+            'appName' => 'Shop',
+            'entry'   => ['title' => 'Home', 'fields' => ['tagline' => 'Hi']],
+        ]);
+        self::assertStringNotContainsString('Featured this week', $html);
+    }
+
     /**
      * The header cart count renders ONLY when a cart_summary is supplied (section
      * pages). On content pages (null summary) it must not render — a count baked into
