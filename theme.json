@@ -1,13 +1,13 @@
 {
     "name": "Aurora",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "A magical-sky theme for NimbusCMS — deep-indigo night grounds, an aurora accent, and moonlit-parchment content. Ships a fully-styled Storefront (shop) and generic content templates. Plain PHP, one stylesheet, no build step, no external assets. An official theme.",
     "nav": true,
     "templates": {
         "layout": "HTML shell; includes header and footer.",
         "header": "Wordmark + main menu on the night ground.",
         "footer": "Footer menu + colophon under an aurora hairline.",
-        "entry-home": "The storefront landing page (the `home` singleton). Composes optional authored fields: eyebrow (hero kicker), tagline (H1), subhead (lead), hero {url,alt} (image), promise (one 'Label | detail' per line → the promise strip), aisles (one 'Label | detail | /relative-url' per line → shop-by-aisle tiles; links are relative-only), body (prose about-teaser), closing_title + closing (the closing night band). Every field is optional — the page degrades gracefully.",
+        "entry-home": "The storefront landing page (the `home` singleton). Composes optional authored fields: eyebrow (hero kicker), tagline (H1), subhead (lead), hero {url,alt} (image), promise (one 'Label | detail' per line → the promise strip), aisles (one 'Label | detail | /relative-url' per line → shop-by-aisle tiles; links are relative-only), body (prose about-teaser), closing_title + closing (the closing night band). Every field is optional — the page degrades gracefully. Also renders a live 'Featured this week' row from contributed view data (ADR 0027) when a storefront plugin provides contrib['nimbuscms.storefront']['featured'].",
         "entry": "A single entry — a centered reading column on parchment. String fields render through the theme's small prose parser (## headings, - / 1. lists, **bold**, [text](/relative) links — escape-first, relative links only).",
         "collection": "A collection's entries as a card grid.",
         "shop-index": "Overrides the Storefront plugin's listing (ADR 0023) — a night hero, filter bar, and product grid.",
