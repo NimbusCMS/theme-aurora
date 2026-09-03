@@ -98,6 +98,22 @@ final class ThemeRenderTest extends TestCase
         self::assertStringContainsString('&lt;b&gt;', $html);
     }
 
+    public function test_order_confirmation_renders_an_itemised_receipt_escaped(): void
+    {
+        $html = $this->view->renderBare('shop-order', [
+            'ref'   => 'ORD-9',
+            'order' => [
+                'status' => 'placed', 'total' => '1.80',
+                'lines'  => [['name' => '<script>alert(1)</script>', 'sku_code' => 'x', 'qty' => 2, 'unit_price' => '0.90', 'line_total' => '1.80']],
+            ],
+        ]);
+
+        self::assertStringContainsString('Your order', $html);
+        self::assertStringNotContainsString('<script>alert(1)</script>', $html, 'the line name is escaped');
+        self::assertStringContainsString('&lt;script&gt;', $html);
+        self::assertStringContainsString('1.80', $html, 'the total renders');
+    }
+
     /**
      * The prose parser's one security rule: escape FIRST, format second. A script tag
      * in author copy is inert; `**bold**`/`## `/lists produce only the tags the

@@ -333,6 +333,15 @@ a.aisle:hover { transform: translateY(-3px); box-shadow: 0 10px 34px rgba(11,16,
 
 /* ---------------------------------------------------------------- cart extras */
 
+/* Order confirmation receipt (ADR 0026 itemised order). */
+.receipt { max-width: 34rem; background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 1.25rem 1.4rem; box-shadow: var(--shadow); }
+.receipt h2 { margin: 0 0 .75rem; font-size: 1.1rem; }
+.receipt-row { display: flex; justify-content: space-between; gap: 1rem; padding: .5rem 0; border-bottom: 1px solid var(--hairline); }
+.receipt-row:last-child { border-bottom: 0; }
+.receipt-name { flex: 1; }
+.receipt-qty { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.receipt-total { margin-top: .35rem; border-top: 1px solid var(--hairline); border-bottom: 0; padding-top: .75rem; font-size: 1.1rem; }
+
 .cart-empty { text-align: center; padding: 3rem 1rem; display: flex; flex-direction: column; align-items: center; gap: .9rem; }
 .cart-empty-mark { font-size: 2.6rem; margin: 0; }
 .cart-each { display: block; color: var(--ink-soft); font-size: .82rem; font-weight: 400; }
