@@ -10,6 +10,7 @@
  * @var array<string,array<string,mixed>> $blocks reusable content blocks by slug
  * @var array{title:string,description:string,canonical:string,og_type:string} $meta
  * @var string $head extra <head> HTML contributed by plugins (already-rendered, trusted)
+ * @var array{count:int,total:string}|null $cart_summary present only on section pages
  */
 $pageTitle = isset($title) && $title !== '' ? $title . ' · ' . $appName : $appName;
 $meta = $meta ?? [];
@@ -50,7 +51,7 @@ $cssVer = substr((string) @hash_file('crc32b', __DIR__ . '/../assets/app.css'), 
 <?php if ($announcementText !== null && $announcementText !== ''): ?>
     <div class="announcement"><?= $e($announcementText) ?></div>
 <?php endif; ?>
-<?= $partial('header') ?>
+<?= $partial('header', ['cart_summary' => $cart_summary ?? null]) ?>
 <main id="main">
     <?= $__content ?>
 </main>

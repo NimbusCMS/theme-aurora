@@ -263,13 +263,78 @@ main { display: block; }
 .checkout-form input { font: inherit; padding: .65rem .7rem; min-height: 44px; border: 1px solid var(--hairline); border-radius: 10px; background: #fff; }
 .checkout-form input:focus { border-color: var(--aurora-2); outline: none; box-shadow: 0 0 0 3px rgba(139,123,240,.18); }
 
+/* ---------------------------------------------------------------- flash + cart pill */
+
+.flash { margin: 0 0 1.5rem; padding: .8rem 1.1rem; border-radius: var(--radius); border: 1px solid var(--hairline); background: var(--panel); box-shadow: var(--shadow); }
+.flash a { text-decoration: underline; }
+.flash-ok   { border-color: rgba(47,158,127,.4);  background: rgba(47,158,127,.08); }
+.flash-warn { border-color: rgba(201,138,43,.45); background: rgba(201,138,43,.10); }
+
+.nav-cart { display: inline-flex; align-items: center; gap: .45rem; padding-inline: .9rem; }
+.nav-cart .count {
+    display: inline-grid; place-items: center; min-width: 1.4rem; height: 1.4rem; padding: 0 .35rem;
+    border-radius: 999px; background: var(--gold); color: var(--night);
+    font-size: .78rem; font-weight: 800; font-variant-numeric: tabular-nums;
+}
+
+.btn-sm { min-height: 38px; padding: .4rem .85rem; font-size: .9rem; }
+
+/* The card you just added — a gold ring + a revealed aurora edge. */
+.product.is-added { box-shadow: 0 0 0 2px var(--gold), var(--shadow); }
+.product.is-added::before { opacity: 1; }
+
+/* ---------------------------------------------------------------- home landing */
+
+.promise { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+@media (min-width: 40rem) { .promise { grid-template-columns: repeat(3, 1fr); } }
+.promise-item { background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 1.1rem 1.2rem; box-shadow: var(--shadow); }
+.promise-label { font-family: var(--serif); font-size: 1.1rem; font-weight: 600; margin: 0 0 .25rem; }
+.promise-detail { color: var(--ink-soft); margin: 0; font-size: .95rem; }
+
+.aisle-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: 1rem; margin-top: 1.5rem; }
+.aisle {
+    display: flex; flex-direction: column; gap: .2rem; position: relative;
+    background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--radius);
+    padding: 1.1rem 2.4rem 1.1rem 1.2rem; box-shadow: var(--shadow);
+    transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+}
+a.aisle:hover { transform: translateY(-3px); box-shadow: 0 10px 34px rgba(11,16,32,.14); border-color: var(--gold); }
+.aisle-label { font-family: var(--serif); font-size: 1.15rem; font-weight: 600; }
+.aisle-detail { color: var(--ink-soft); font-size: .92rem; }
+.aisle-go { position: absolute; top: 1.1rem; right: 1.2rem; color: var(--gold); font-weight: 700; }
+
+.home-about { background: var(--panel); border-block: 1px solid var(--hairline); }
+
+.cta-band { text-align: center; }
+.cta-band h2 { color: var(--on-night); }
+.cta-band p { color: var(--on-night-soft); max-width: 50ch; margin-inline: auto; }
+.cta-band .actions { display: flex; justify-content: center; margin-top: 1.5rem; }
+
+/* ---------------------------------------------------------------- prose headings + lists */
+
+.prose h2, .entry-body h2 { margin: 1.8rem 0 .6rem; }
+.prose ul, .prose ol, .entry-body ul, .entry-body ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+.prose li, .entry-body li { margin: .2rem 0; }
+
+/* ---------------------------------------------------------------- cart extras */
+
+.cart-empty { text-align: center; padding: 3rem 1rem; display: flex; flex-direction: column; align-items: center; gap: .9rem; }
+.cart-empty-mark { font-size: 2.6rem; margin: 0; }
+.cart-each { display: block; color: var(--ink-soft); font-size: .82rem; font-weight: 400; }
+
 /* ---------------------------------------------------------------- footer */
 
 .site-footer { margin-top: 4rem; border-top: 2px solid transparent; border-image: var(--aurora) 1; }
 .site-footer .inner { background: var(--night); color: var(--on-night-soft); }
-.site-footer .container { padding-block: 2.5rem; display: flex; flex-direction: column; gap: .6rem; }
+.site-footer .foot-grid {
+    padding-block: 2.5rem 1.5rem; display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 1.5rem; flex-wrap: wrap;
+}
+.site-footer .foot-legal { padding-block: 0 2.2rem; border-top: 1px solid var(--night-line); padding-top: 1.2rem; }
+.site-footer .foot-legal p { margin: 0; font-size: .9rem; }
 .site-footer a { color: var(--on-night-soft); }
 .site-footer a:hover { color: var(--on-night); }
+.site-footer .foot-brand .wordmark { color: var(--on-night); }
 .site-footer .foot-nav { display: flex; gap: 1.25rem; flex-wrap: wrap; }
 
 /* ---------------------------------------------------------------- motion */

@@ -10,16 +10,8 @@
  */
 $e = $e ?? static fn (?string $v): string => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 
-// Render a body-like string as escaped paragraphs (blank line = new paragraph).
-$prose = static function (string $text) use ($e): string {
-    $out = '';
-    foreach (preg_split('/\n\s*\n/', trim($text)) ?: [] as $para) {
-        if (trim($para) !== '') {
-            $out .= '<p>' . nl2br($e($para)) . '</p>';
-        }
-    }
-    return $out;
-};
+// Render author copy as real prose (headings, lists, bold, safe links) — escape-first.
+$prose = require __DIR__ . '/_prose.php';
 $renderField = static function (mixed $value) use ($e, $prose): string {
     if ($value === null || $value === '' || $value === []) {
         return '';
@@ -34,7 +26,7 @@ $renderField = static function (mixed $value) use ($e, $prose): string {
         return $value ? 'Yes' : 'No';
     }
     if (is_scalar($value)) {
-        return $prose((string) $value);
+        return $prose((string) $value, $e);
     }
     return '';
 };

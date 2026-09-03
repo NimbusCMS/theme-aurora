@@ -6,12 +6,28 @@
  * @var callable(?int):?array{url:string,alt:?string} $media
  * @var array<string,mixed> $item
  * @var string $cart_csrf
+ * @var array{sku:string,name:string}|null $added
+ * @var ?string $notice
  */
 $labels = ['in_stock' => 'In stock', 'low' => 'Low stock', 'out' => 'Out of stock'];
-$img    = $media($item['image_media_id']);
+$notices = [
+    'unavailable' => 'That item is unavailable right now.',
+    'expired'     => 'Your session expired — please try again.',
+    'empty'       => 'Your cart is empty.',
+    'stock'       => 'Sorry, that item just went out of stock.',
+];
+$added   = $added ?? null;
+$notice  = $notice ?? null;
+$isAdded = $added !== null && $added['sku'] === $item['sku_code'];
+$img     = $media($item['image_media_id']);
 ?>
 <div class="container section">
     <a class="back" href="/shop">← Back to shop</a>
+    <?php if ($added !== null): ?>
+        <p class="flash flash-ok" role="status">Added <strong><?= $e($added['name']) ?></strong> to your cart. <a href="/cart">View cart →</a></p>
+    <?php elseif ($notice !== null && isset($notices[$notice])): ?>
+        <p class="flash flash-warn" role="status"><?= $e($notices[$notice]) ?></p>
+    <?php endif; ?>
     <div class="product-detail">
         <div class="media">
             <?php if ($img !== null): ?>
@@ -29,8 +45,9 @@ $img    = $media($item['image_media_id']);
                 <form class="add" method="post" action="/ext/shop/cart/add">
                     <input type="hidden" name="_cart_csrf" value="<?= $e($cart_csrf ?? '') ?>">
                     <input type="hidden" name="sku" value="<?= $e($item['sku_code']) ?>">
+                    <input type="hidden" name="return" value="product">
                     <input type="number" name="qty" value="1" min="1" max="999" inputmode="numeric" aria-label="Quantity">
-                    <button type="submit" class="btn btn-primary">Add to cart</button>
+                    <button type="submit" class="btn btn-primary"><?= $isAdded ? 'Added ✓ — add more' : 'Add to cart' ?></button>
                 </form>
             <?php endif; ?>
             <?php if ($item['description'] !== null): ?>
